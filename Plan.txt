@@ -1,0 +1,79 @@
+* Mục đích: Tạo "Web App tạo PDF tự động" phục vụ việc chuyển đổi số quy trình tại các phòng khám đảm bảo tính thông minh (tự động hóa), tối ưu (dễ sử dụng, không cần cài đặt phần mềm nặng) và hiệu quả (in ấn chính xác).
+* Mô tả: web app chứa các form thông tin để người dùng nhập vào tương ứng với các trường thông tin còn trống trong mẫu "phôi" tạo từ hình ảnh của tôi cung cấp. Sau khi điền hết các thống tin, sẽ có nút xuất pdf, thì sẽ tự động điền các thông tin còn trống đó vào đúng mẫu được tạo ra giống nhau hình ảnh tôi cung cấp cho bạn để thực hiện in.
+* Dự kiến các bước thực hiện: 
+- Tạo mẫu phôi: tạo "Phôi" phiếu in bằng Code (HTML/CSS)
+Chúng ta sẽ dựng một trang web với kích thước cố định là khổ giấy A4. Sử dụng HTML/CSS để chia cột, kẻ bảng, chèn Logo (bạn cung cấp) vào góc trái.
+
+Phần tiêu đề (Header): Dùng Flexbox để chia layout.
+
+Phần thông tin: Dùng các thẻ <div> có border-bottom dạng nét đứt (dashed) để tạo dòng kẻ chấm giống hệt mẫu.
+- Tạo và tương tác với sơ do rang:
+Giải pháp SVG (Đồ họa vector): Sơ đồ răng sẽ được vẽ bằng các đường nét vector. Mỗi chiếc răng là một đối tượng độc lập có ID riêng (ví dụ: <path id="rang-18" ... />).
+
+Ưu điểm vượt trội của SVG cho tính năng tương tác:
+
+Tương tác chính xác: Bạn click vào đúng hình dáng chiếc răng thì mới nhận lệnh (không bị click nhầm vào vùng trắng xung quanh).
+
+Đổi màu động: Khi bạn chẩn đoán "Răng 36 - Sâu", chương trình có thể lập tức tô màu đỏ cho riêng chiếc răng 36 đó trên sơ đồ. Điều này ảnh thường không làm được.
+
+In ấn sắc nét: Dù phóng to cỡ nào hình cũng không vỡ.
+Chúng ta sẽ dùng một bản vẽ SVG chuẩn nha khoa (tôi có thể cung cấp bộ code mẫu sơ đồ răng chuẩn Quốc tế cho bạn).
+
+Cơ chế hoạt động:
+
+Hiển thị: Vẽ ra 2 hàm răng (hoặc 4 cung hàm) trên màn hình.
+
+Sự kiện Click:
+
+Người dùng click vào Răng 36.
+
+Hệ thống bật lên một hộp thoại nhỏ: "Nhập tình trạng cho răng 36".
+
+Người dùng chọn "Sâu răng" -> Lưu.
+
+Kết quả:
+
+Trên màn hình: Răng 36 chuyển màu đỏ.
+
+Bên dưới dòng "Chẩn đoán": Tự động thêm dòng chữ "Răng 36: Sâu răng".
+* Giải pháp công nghệ: 
+Tôi khuyên bạn nên xây dựng một Web Application (chạy trên trình duyệt Chrome/Edge).
+
+Lý do: Có thể dùng trên máy tính lễ tân, máy tính bác sĩ hoặc thậm chí iPad. Không cần cài đặt phức tạp.
+
+Công cụ đề xuất:
+
+Giao diện nhập liệu (Frontend): HTML5, CSS3, JavaScript (hoặc ReactJS nếu muốn mở rộng sau này).
+
+Thư viện xử lý PDF: pdf-lib hoặc jspdf. Đây là các thư viện Javascript mạnh mẽ cho phép chèn chữ vào tọa độ (x, y) cụ thể trên một file PDF mẫu.
+* Quy trình hoạt động của công cụ
+Công cụ sẽ hoạt động theo luồng 3 bước như sau:
+
+Bước 1: Form nhập liệu thông minh
+Giao diện bên trái màn hình là các ô nhập liệu tương ứng với các mục trên giấy:
+
+Họ tên (Text)
+
+Năm sinh (Number)
+
+Giới tính (Radio button: Nam/Nữ)
+
+Địa chỉ (Text area)
+
+Tiền sử bệnh, Chẩn đoán, Kế hoạch điều trị (Text area - hỗ trợ gợi ý các bệnh thường gặp để chọn nhanh).
+
+Sơ đồ răng: Đây là tính năng nâng cao. Thay vì gõ text, bạn có thể làm một sơ đồ răng tương tác, click vào cái răng nào thì ghi chú cho răng đó (VD: Răng 36 - Sâu độ 2).
+
+Bước 2: Xử lý Mapping (Gán dữ liệu)
+Khi người dùng bấm nút "Xuất PDF", hệ thống sẽ:
+
+Tải file "Phôi PDF" (đã làm ở mục 1) lên bộ nhớ.
+
+Lấy dữ liệu người dùng vừa nhập.
+
+Dùng thư viện code để "vẽ" chữ vào đúng vị trí tọa độ trên phôi.
+
+Ví dụ: Tên "Phạm Văn Phận" sẽ được đặt tại tọa độ x: 120, y: 85 với font chữ Times New Roman, size 12.
+
+Bước 3: Xuất và In
+Trình duyệt sẽ tải về một file PDF hoàn chỉnh. File này nhìn y hệt tờ giấy bạn chụp, nhưng chữ là chữ máy tính in, thẳng hàng, rõ nét. Bạn chỉ cần bấm Ctrl + P để in ra giấy A5 hồng trắng.

@@ -1,0 +1,82 @@
+.layout-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-color);
+}
+
+.layout-left {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+    background: white;
+    min-width: 400px;
+}
+
+.layout-right {
+    flex: 1.5;
+    padding: 20px;
+    background-color: #525659;
+    /* PDF viewer background style */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+}
+
+@media print {
+    @page {
+        size: A5 landscape;
+        margin: 0;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: white;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .layout-left,
+    .toolbar,
+    .app-container>.toolbar {
+        display: none !important;
+    }
+
+    .layout-container {
+        display: block;
+        height: auto;
+        width: auto;
+        background: none;
+    }
+
+    .layout-right {
+        display: block;
+        padding: 0;
+        margin: 0;
+        background: none;
+        overflow: visible;
+        width: 100%;
+        height: 100%;
+    }
+
+    .print-template-container {
+        padding: 0 !important;
+        background: none !important;
+        display: block !important;
+        width: 100%;
+        height: 100%;
+    }
+
+    .paper-a5 {
+        box-shadow: none !important;
+        margin: 0;
+        width: 100% !important;
+        /* A5 Dimensions in print might need exact mm or 100% */
+        /* width: 210mm !important; */
+        /* height: 148mm !important; */
+        page-break-after: always;
+    }
+}

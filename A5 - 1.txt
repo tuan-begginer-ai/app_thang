@@ -1,0 +1,375 @@
+/* A5 - 1 */
+
+position: relative;
+width: 595px;
+height: 420px;
+
+background: #F3E6E6;
+transform: matrix(1, 0, 0, -1, 0, 0);
+
+
+/* logo-quoc-Binh-ena 1 */
+
+position: absolute;
+width: 124px;
+height: 42px;
+left: -14px;
+top: 5px;
+
+background: url(logo-quoc-Binh-ena.png);
+
+
+/* CTY TNHH NHA KHOA */
+
+position: absolute;
+width: 116px;
+height: 15px;
+left: 90px;
+top: 10px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 700;
+font-size: 11px;
+line-height: 15px;
+/* identical to box height */
+
+color: #74351A;
+
+
+
+/* QUỐC BÌNH */
+
+position: absolute;
+width: 73px;
+height: 25px;
+left: 211px;
+top: 4px;
+
+font-family: 'Courgette';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 25px;
+/* identical to box height, or 179% */
+text-align: center;
+
+color: #E81E1E;
+
+
+
+/* Khám chữa bệnh CK: RĂNG HÀM MẶT */
+
+position: absolute;
+width: 201px;
+height: 15px;
+left: 90px;
+top: 29px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 700;
+font-size: 11px;
+line-height: 15px;
+/* identical to box height */
+
+color: #2830CB;
+
+
+
+/* Group 2 */
+
+position: absolute;
+width: 275px;
+height: 64px;
+left: 16px;
+top: 44px;
+
+transform: matrix(-1, 0, 0, 1, 0, 0);
+
+
+/* Rectangle 1 */
+
+position: absolute;
+width: 275px;
+height: 64px;
+left: 16px;
+top: 44px;
+
+background: #F3E6E6;
+
+
+/* Group 1 */
+
+position: absolute;
+width: 269px;
+height: 63px;
+left: 22px;
+top: 45px;
+
+transform: matrix(-1, 0, 0, 1, 0, 0);
+
+
+/* CS1: 19 Phạm Hồng Thái, P.7, VT CS2: 28 Lê Lợi, P.4, Vũng Tàu CS3: 649 Trương Công Định, P.7, VT GĐ-BS: Phan Quốc Bình */
+
+position: absolute;
+width: 176px;
+height: 60px;
+left: 22px;
+top: 48px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 15px;
+
+color: #74351A;
+
+
+
+/* ĐT: 0254.3839966 ĐT: 0254.3818318 ĐT: 0708.649 649 DĐ: 0914.839966 */
+
+position: absolute;
+width: 85px;
+height: 60px;
+left: 206px;
+top: 45px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 15px;
+
+color: #74351A;
+
+
+
+/* Chuyên: */
+
+position: absolute;
+width: 37px;
+height: 15px;
+left: 305px;
+top: 4px;
+
+font-family: 'Playball';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height */
+
+color: #E81E1E;
+
+
+
+/* Đặc biệt: */
+
+position: absolute;
+width: 41px;
+height: 15px;
+left: 305px;
+top: 59px;
+
+font-family: 'Playball';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height */
+
+color: #E81E1E;
+
+
+
+/* Trám - Nhổ răng - Lấy cao răng - Chữa răng và các bệnh răng miệng Làm răng giả các loại - Chụp CT - X.Quang KTS - Răng hàm mặt */
+
+position: absolute;
+width: 292px;
+height: 36px;
+left: 296px;
+top: 17px;
+
+font-family: 'Roboto Condensed';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 18px;
+/* or 164% */
+letter-spacing: -0.02em;
+
+color: #74351A;
+
+
+
+/* Cắm ghép (Implant) & Chỉnh răng kỹ thuật mới nhanh nhất Điều trị răng miệng, tẩy răng & Phẩu thuật bằng Laser */
+
+position: absolute;
+width: 243px;
+height: 37px;
+left: 349px;
+top: 57px;
+
+font-family: 'Roboto Condensed';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 18px;
+/* or 164% */
+letter-spacing: -0.02em;
+
+color: #2830CB;
+
+
+
+/* PHIẾU ĐIỀU TRỊ CS1 */
+
+position: absolute;
+width: 221px;
+height: 15px;
+left: 265px;
+top: 113px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 15px;
+/* identical to box height, or 62% */
+
+color: #C35E33;
+
+
+
+/* Email: nhakhoaquocbinh@yahoo.com Website: www.nhakhoaquocbinh.com */
+
+position: absolute;
+width: 156px;
+height: 30px;
+left: 22px;
+top: 110px;
+
+font-family: 'Roboto Condensed';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 15px;
+/* or 136% */
+letter-spacing: -0.02em;
+
+color: #74351A;
+
+
+
+/* Họ và tên: ............................................................... Địa chỉ: ................................................................... Tiền sử bệnh: ......................................................... Chuẩn đoán: .......................................................... Kế hoạch điều trị: ................................................. ................................................................................. ................................................................................. ................................................................................. */
+
+position: absolute;
+width: 269px;
+height: 158px;
+left: 22px;
+top: 142px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 20px;
+/* or 167% */
+
+color: #000000;
+
+
+
+/* Vũng Tàu, ngày ..... tháng ..... năm ......... BÁC SĨ KHÁM */
+
+position: absolute;
+width: 216px;
+height: 36px;
+left: 70px;
+top: 305px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 15px;
+/* or 136% */
+text-align: center;
+letter-spacing: -0.02em;
+
+color: #000000;
+
+
+
+/* Năm sinh: .........../............/............. Nam/nữ ĐT: ........................................Nghề nghiệp: .................... */
+
+position: absolute;
+width: 293px;
+height: 28px;
+left: 307px;
+top: 142px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* or 125% */
+letter-spacing: -0.02em;
+
+color: #000000;
+
+
+
+/* Rectangle 3 */
+
+position: absolute;
+width: 197px;
+height: 131px;
+left: 349px;
+top: 201px;
+
+background: #D9D9D9;
+
+
+/* HIỂN THỊ SƠ ĐỒ RĂNG */
+
+position: absolute;
+width: 117px;
+height: 15px;
+left: 395px;
+top: 255px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height, or 125% */
+letter-spacing: -0.02em;
+
+color: #000000;
+
+
+
+/* * CÓ ĐỨC CÓ TÂM - NGHĨA TÌNH Rạng rỡ nụ cười - Sáng ngời sức khỏe Hotline: 0918 266 600 */
+
+position: absolute;
+width: 200px;
+height: 45px;
+left: 351px;
+top: 363px;
+
+font-family: 'Noticia Text';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* or 125% */
+text-align: center;
+letter-spacing: -0.02em;
+
+color: #000000;
+

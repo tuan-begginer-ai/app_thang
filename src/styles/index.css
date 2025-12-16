@@ -1,0 +1,27 @@
+:root {
+  --primary-color: #007bff;
+  --text-color: #333;
+  --bg-color: #f4f7f6;
+  --border-color: #ddd;
+  --premium-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}

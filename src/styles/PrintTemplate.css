@@ -1,0 +1,414 @@
+/* Base Container */
+.print-template-container {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    background-color: #525659;
+}
+
+.paper-a5 {
+    width: 595px;
+    height: 420px;
+    background: #E5CECD;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    font-family: 'Noticia Text', serif;
+}
+
+/* --- Header Elements (Restored mostly, but keeping 'Quoc Binh' LEFT per request) --- */
+
+.a5-logo {
+    position: absolute;
+    width: 124px;
+    height: 42px;
+    left: -14px;
+    top: 5px;
+    object-fit: contain;
+}
+
+.a5-company-name {
+    position: absolute;
+    width: 156px;
+    height: 15px;
+    left: 90px;
+    top: 10px;
+
+    font-family: 'Noticia Text';
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 15px;
+    color: #74351A;
+    white-space: nowrap;
+}
+
+.a5-quoc-binh {
+    position: absolute;
+    width: 120px;
+    height: 25px;
+    left: 195px;
+    /* KEEP THIS CHANGE: Moved left to be closer */
+    top: 4px;
+
+    font-family: 'Courgette';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 25px;
+    text-align: center;
+    color: #E81E1E;
+}
+
+.a5-specialty {
+    position: absolute;
+    width: 201px;
+    height: 15px;
+    left: 90px;
+    top: 29px;
+
+    font-family: 'Noticia Text';
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 15px;
+    color: #2830CB;
+}
+
+.a5-address-block {
+    position: absolute;
+    width: 176px;
+    height: 60px;
+    left: 22px;
+    top: 48px;
+
+    font-family: 'Noticia Text';
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 15px;
+    color: #74351A;
+}
+
+.a5-phone-block {
+    position: absolute;
+    width: 95px;
+    height: 60px;
+    left: 206px;
+    top: 45px;
+
+    font-family: 'Noticia Text';
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 15px;
+    color: #74351A;
+    text-align: left;
+}
+
+.a5-chuyen-label {
+    position: absolute;
+    width: 37px;
+    height: 15px;
+    left: 305px;
+    top: 4px;
+    font-family: 'Playball';
+    font-size: 12px;
+    line-height: 15px;
+    color: #E81E1E;
+}
+
+.a5-dac-biet-label {
+    position: absolute;
+    width: 41px;
+    height: 15px;
+    left: 305px;
+    top: 59px;
+    font-family: 'Playball';
+    font-size: 12px;
+    line-height: 15px;
+    color: #E81E1E;
+}
+
+.a5-services-1 {
+    position: absolute;
+    width: 292px;
+    height: 36px;
+    left: 296px;
+    top: 17px;
+    font-family: 'Roboto Condensed';
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 18px;
+    letter-spacing: -0.02em;
+    color: #74351A;
+    text-align: left;
+    padding-left: 5px;
+}
+
+.a5-services-2 {
+    position: absolute;
+    width: 243px;
+    height: 37px;
+    left: 349px;
+    top: 57px;
+    font-family: 'Roboto Condensed';
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 18px;
+    letter-spacing: -0.02em;
+    color: #2830CB;
+}
+
+.a5-web-contact {
+    position: absolute;
+    width: 156px;
+    height: 30px;
+    left: 22px;
+    top: 110px;
+    font-family: 'Roboto Condensed';
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 15px;
+    letter-spacing: -0.02em;
+    color: #74351A;
+}
+
+/* Main Title - KEEP THIS CHANGE: Wider width to prevent wrap */
+.a5-main-title {
+    position: absolute;
+    width: 300px;
+    height: 25px;
+    left: 225px;
+    top: 113px;
+    font-family: 'Noticia Text';
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 24px;
+    color: #C35E33;
+    text-align: center;
+}
+
+.a5-form-left {
+    position: absolute;
+    width: 269px;
+    height: 200px;
+    left: 22px;
+    top: 142px;
+    font-family: 'Noticia Text';
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    /* Keep this or increase it? Let's leave line-height alone for text, but increase container heights */
+    color: #000000;
+}
+
+.a5-line-row {
+    display: flex;
+    align-items: flex-end;
+    height: 18px;
+    width: 100%;
+    margin-bottom: 2pt;
+}
+
+.a5-label {
+    white-space: nowrap;
+    margin-right: 5px;
+    padding-bottom: 0px;
+    /* Removed padding to align text baseline with border */
+    line-height: 1;
+    /* Reset line-height to avoid layout shifts */
+    margin-bottom: 2px;
+    /* Lift text slightly so descenders don't hit the absolute bottom line */
+}
+
+.a5-line {
+    flex-grow: 1;
+    border-bottom: 0.5px solid #000;
+    /* transform: translateY(2px); Removing this as it likely causes subpixel blurring making it look bold */
+}
+
+/* For lines with no label */
+.a5-line-full {
+    width: 100%;
+    height: 18px;
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 2pt;
+}
+
+.a5-line-full::after {
+    content: '';
+    flex-grow: 1;
+    border-bottom: 0.5px solid #000;
+}
+
+.a5-form-right {
+    position: absolute;
+    width: 293px;
+    height: 28px;
+    left: 307px;
+    top: 142px;
+    font-family: 'Noticia Text';
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    letter-spacing: -0.02em;
+    color: #000000;
+}
+
+/* Data Overlays */
+.field-overlay {
+    position: absolute;
+    color: #2830CB;
+    font-family: 'Noticia Text';
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* Chart Box */
+.a5-chart-box {
+    position: absolute;
+    width: 248px;
+    height: 148px;
+    left: 320px;
+    top: 200px;
+    background: #F3E6E6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Footer Sig */
+.a5-footer-sig {
+    position: absolute;
+    width: 216px;
+    height: 36px;
+    left: 70px;
+    top: 310px;
+    font-family: 'Noticia Text';
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 15px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: #000000;
+    font-style: italic;
+}
+
+.a5-doctor-name {
+    margin-top: 40px;
+    font-family: 'Courgette';
+    font-size: 14px;
+    color: #E81E1E;
+}
+
+/* Slogan Container - KEEP THIS CHANGE: Moved Up */
+.a5-slogan-container {
+    position: absolute;
+    width: 200px;
+    height: 45px;
+    left: 351px;
+    top: 350px;
+    text-align: center;
+}
+
+.slogan-main {
+    font-family: 'Noticia Text';
+    font-weight: 700;
+    font-size: 11px;
+    font-style: italic;
+    color: #d32f2f;
+}
+
+.slogan-sub {
+    font-family: 'Noticia Text';
+    font-size: 11px;
+    font-style: italic;
+    color: #2830CB;
+}
+
+.slogan-hotline {
+    font-family: 'Noticia Text';
+    font-weight: 700;
+    font-size: 12px;
+    color: #E81E1E;
+    border: 1px solid #E81E1E;
+    border-radius: 12px;
+    padding: 2px 10px;
+    display: inline-block;
+    margin-top: 4px;
+    background: #E5CECD;
+}
+
+@media print {
+
+    /* Define A5 Landscape explicitly to help printer driver switch mode */
+    @page {
+        size: A5 landscape;
+        margin: 0;
+    }
+
+    /* Reset Body */
+    body {
+        background: white;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible !important;
+    }
+
+    /* Hide UI components */
+    .layout-left,
+    .toolbar,
+    .layout-right::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    /* Transparency wrappers */
+    .app-container,
+    .layout-container,
+    .layout-right {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: none !important;
+        overflow: visible !important;
+    }
+
+    /* Print Template Container - Fill the page and Center the form */
+    .print-template-container {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: transparent !important;
+        /* Let paper color show */
+
+        display: flex !important;
+        justify-content: center;
+        /* Center Horizontal */
+        align-items: center;
+        /* Center Vertical */
+        z-index: 9999;
+    }
+
+    .paper-a5 {
+        /* Force background print (if printer supports color) */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+
+        /* 
+           Safe Scale Calculation:
+           Using 1.25 to be extra safe and ensure no clipping.
+        */
+        transform: scale(1.25);
+        transform-origin: center center;
+
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+}

@@ -1,0 +1,52 @@
+{
+  "name": "app-doctor",
+  "private": true,
+  "version": "0.1.0",
+  "main": "electron/main.cjs",
+  "author": "User",
+  "description": "App Doctor Application",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on tcp:5173 && electron .\"",
+    "electron:build": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "html-to-image": "^1.11.13",
+    "jspdf": "^2.5.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^9.2.1",
+    "electron": "^39.2.6",
+    "electron-builder": "^26.0.12",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "vite": "^5.2.0",
+    "wait-on": "^9.0.3"
+  },
+  "build": {
+    "appId": "com.appdoctor.app",
+    "productName": "App Doctor",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/main.cjs"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
