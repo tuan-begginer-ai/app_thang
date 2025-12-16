@@ -118,6 +118,91 @@ const PatientForm = ({ data, onChange }) => {
                     rows="4"
                 ></textarea>
             </div>
+
+            {/* Treatment History Input Table */}
+            <div className="form-group">
+                <label>Chi tiết điều trị (Page 2)</label>
+                <div className="history-table-container">
+                    <table className="history-table">
+                        <thead>
+                            <tr>
+                                <th width="15%">Ngày</th>
+                                <th width="40%">Chuẩn đoán & Điều trị</th>
+                                <th width="15%">Bác sĩ</th>
+                                <th width="15%">Thành tiền</th>
+                                <th width="15%">Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {(data.treatmentHistory || Array(11).fill({})).map((row, index) => (
+                                <tr key={index}>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={row.date || ''}
+                                            onChange={(e) => {
+                                                const newHistory = [...(data.treatmentHistory || [])];
+                                                if (!newHistory[index]) newHistory[index] = {};
+                                                newHistory[index] = { ...newHistory[index], date: e.target.value };
+                                                onChange('treatmentHistory', newHistory);
+                                            }}
+                                            placeholder="dd/mm"
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={row.diagnosis || ''}
+                                            onChange={(e) => {
+                                                const newHistory = [...(data.treatmentHistory || [])];
+                                                if (!newHistory[index]) newHistory[index] = {};
+                                                newHistory[index] = { ...newHistory[index], diagnosis: e.target.value };
+                                                onChange('treatmentHistory', newHistory);
+                                            }}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={row.doctor || ''}
+                                            onChange={(e) => {
+                                                const newHistory = [...(data.treatmentHistory || [])];
+                                                if (!newHistory[index]) newHistory[index] = {};
+                                                newHistory[index] = { ...newHistory[index], doctor: e.target.value };
+                                                onChange('treatmentHistory', newHistory);
+                                            }}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={row.price || ''}
+                                            onChange={(e) => {
+                                                const newHistory = [...(data.treatmentHistory || [])];
+                                                if (!newHistory[index]) newHistory[index] = {};
+                                                newHistory[index] = { ...newHistory[index], price: e.target.value };
+                                                onChange('treatmentHistory', newHistory);
+                                            }}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={row.note || ''}
+                                            onChange={(e) => {
+                                                const newHistory = [...(data.treatmentHistory || [])];
+                                                if (!newHistory[index]) newHistory[index] = {};
+                                                newHistory[index] = { ...newHistory[index], note: e.target.value };
+                                                onChange('treatmentHistory', newHistory);
+                                            }}
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 };

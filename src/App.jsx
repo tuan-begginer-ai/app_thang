@@ -19,7 +19,8 @@ function App() {
         occupation: '',
         history: '',
         diagnosis: '',
-        treatment: ''
+        treatment: '',
+        treatmentHistory: Array(11).fill({ date: '', diagnosis: '', doctor: '', price: '', note: '' })
     });
 
     const [isManagerOpen, setManagerOpen] = useState(false);
@@ -40,7 +41,8 @@ function App() {
             occupation: '',
             history: '',
             diagnosis: '',
-            treatment: ''
+            treatment: '',
+            treatmentHistory: Array(11).fill({ date: '', diagnosis: '', doctor: '', price: '', note: '' })
         });
     };
 

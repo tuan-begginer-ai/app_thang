@@ -5,9 +5,12 @@ import chartImg from '../assets/dental-chart-static.png';
 // import ToothChart from './ToothChart';
 
 const PrintTemplate = forwardRef(({ data }, ref) => {
+    // Generate empty rows for Page 2
+    const rows = Array(11).fill(null); // 9 rows to fit nicely
+
     return (
-        <div className="print-template-container">
-            <div className="paper-a5" ref={ref}>
+        <div className="print-template-container" ref={ref}>
+            <div className="paper-a5">
 
                 {/* Header Elements */}
                 <img src={logoImg} className="a5-logo" alt="logo" />
@@ -175,6 +178,36 @@ const PrintTemplate = forwardRef(({ data }, ref) => {
                     <div className="slogan-hotline">Hotline: 0918 266 600</div>
                 </div>
 
+            </div>
+
+            {/* Page 2 - Treatment History Table */}
+            <div className="paper-a5-page2">
+                <div className="p2-table">
+                    {/* Header */}
+                    <div className="p2-row p2-header-row">
+                        <div className="p2-cell"><span className="p2-text p2-header-text">Ngày hẹn</span></div>
+                        <div className="p2-cell"><span className="p2-text p2-header-text">Chuẩn đoán & Điều trị</span></div>
+                        <div className="p2-cell"><span className="p2-text p2-header-text">Bác sĩ</span></div>
+                        <div className="p2-cell"><span className="p2-text p2-header-text">Thành tiền</span></div>
+                        <div className="p2-cell"><span className="p2-text p2-header-text">Ghi chú</span></div>
+                    </div>
+
+                    {/* Data Rows */}
+                    {rows.map((_, index) => {
+                        const rowData = (data.treatmentHistory && data.treatmentHistory[index]) || {};
+                        return (
+                            <div key={index} className="p2-row p2-data-row">
+                                <div className="p2-cell"><span className="p2-text">{rowData.date}</span></div>
+                                <div className="p2-cell" style={{ justifyContent: 'flex-start', textAlign: 'left' }}>
+                                    <span className="p2-text" style={{ width: '100%' }}>{rowData.diagnosis}</span>
+                                </div>
+                                <div className="p2-cell"><span className="p2-text">{rowData.doctor}</span></div>
+                                <div className="p2-cell"><span className="p2-text">{rowData.price}</span></div>
+                                <div className="p2-cell"><span className="p2-text">{rowData.note}</span></div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );
