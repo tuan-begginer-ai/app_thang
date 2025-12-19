@@ -25,17 +25,51 @@ function initDatabase() {
             history TEXT,
             diagnosis TEXT,
             treatment TEXT,
+            treatment_history TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     `;
 
     db.exec(createTableQuery);
+
+    // Migration to add treatment_history if it doesn't exist (for existing databases)
+    try {
+        const columns = db.prepare("PRAGMA table_info(patients)").all();
+        const hasTreatmentHistory = columns.some(col => col.name === 'treatment_history');
+        if (!hasTreatmentHistory) {
+            db.exec("ALTER TABLE patients ADD COLUMN treatment_history TEXT");
+        }
+    } catch (e) {
+        console.error("Migration error:", e);
+    }
+}
+
+function parsePatient(patient) {
+    if (!patient) return patient;
+    const result = { ...patient };
+    if (result.treatment_history) {
+        try {
+            result.treatmentHistory = JSON.parse(result.treatment_history);
+        } catch (e) {
+            console.error("Error parsing treatment history", e);
+            result.treatmentHistory = null;
+        }
+    }
+    return result;
+}
+
+function stringifyPatient(patient) {
+    const result = { ...patient };
+    if (result.treatmentHistory) {
+        result.treatment_history = JSON.stringify(result.treatmentHistory);
+    }
+    return result;
 }
 
 function getPatients() {
     const stmt = db.prepare('SELECT * FROM patients ORDER BY created_at DESC');
-    return stmt.all();
+    return stmt.all().map(parsePatient);
 }
 
 function searchPatients(query) {
@@ -46,25 +80,27 @@ function searchPatients(query) {
         ORDER BY created_at DESC
     `);
     const search = `%${query}%`;
-    return stmt.all(search, search, search);
+    return stmt.all(search, search, search).map(parsePatient);
 }
 
 function getPatient(id) {
     const stmt = db.prepare('SELECT * FROM patients WHERE id = ?');
-    return stmt.get(id);
+    return parsePatient(stmt.get(id));
 }
 
 function addPatient(patient) {
+    const data = stringifyPatient(patient);
     const stmt = db.prepare(`
-        INSERT INTO patients (name, dob, gender, address, phone, occupation, history, diagnosis, treatment)
-        VALUES (@name, @dob, @gender, @address, @phone, @occupation, @history, @diagnosis, @treatment)
+        INSERT INTO patients (name, dob, gender, address, phone, occupation, history, diagnosis, treatment, treatment_history)
+        VALUES (@name, @dob, @gender, @address, @phone, @occupation, @history, @diagnosis, @treatment, @treatment_history)
     `);
 
-    const info = stmt.run(patient);
+    const info = stmt.run(data);
     return { id: info.lastInsertRowid, ...patient };
 }
 
 function updatePatient(id, patient) {
+    const data = stringifyPatient(patient);
     const stmt = db.prepare(`
         UPDATE patients 
         SET name = @name, 
@@ -76,11 +112,12 @@ function updatePatient(id, patient) {
             history = @history, 
             diagnosis = @diagnosis,
             treatment = @treatment,
+            treatment_history = @treatment_history,
             updated_at = CURRENT_TIMESTAMP
         WHERE id = @id
     `);
 
-    const info = stmt.run({ ...patient, id });
+    const info = stmt.run({ ...data, id });
     return info.changes > 0;
 }
 

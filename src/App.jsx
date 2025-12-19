@@ -6,7 +6,6 @@ import PatientManager from './components/PatientManager';
 import { dbService } from './services/db';
 // import ToothChart from './components/ToothChart';
 import jsPDF from 'jspdf';
-import { toPng } from 'html-to-image';
 
 function App() {
     const [patientData, setPatientData] = useState({
@@ -24,6 +23,7 @@ function App() {
     });
 
     const [isManagerOpen, setManagerOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const templateRef = useRef(null);
 
     const handleFormChange = (name, value) => {
@@ -52,6 +52,7 @@ function App() {
             return;
         }
 
+        setIsSaving(true);
         try {
             let saved;
             if (patientData.id) {
@@ -66,11 +67,23 @@ function App() {
         } catch (error) {
             console.error(error);
             alert('Có lỗi khi lưu dữ liệu!');
+        } finally {
+            setIsSaving(false);
         }
     };
 
     const handleSelectPatient = (patient) => {
-        setPatientData(patient);
+        // Ensure treatmentHistory has 11 rows if it's missing or short
+        const history = patient.treatmentHistory || [];
+        const paddedHistory = [...history];
+        while (paddedHistory.length < 11) {
+            paddedHistory.push({ date: '', diagnosis: '', doctor: '', price: '', note: '' });
+        }
+
+        setPatientData({
+            ...patient,
+            treatmentHistory: paddedHistory
+        });
         setManagerOpen(false);
     };
 
@@ -95,10 +108,14 @@ function App() {
         if (!templateRef.current) return;
 
         try {
-            const dataUrl = await toPng(templateRef.current, {
+            const { toJpeg } = await import('html-to-image');
+
+            // Configuration for quality and size
+            const options = {
+                quality: 0.95,
                 cacheBust: true,
-                pixelRatio: 2 // High resolution
-            });
+                pixelRatio: 1.5 // Balanced between quality and size
+            };
 
             const pdf = new jsPDF({
                 orientation: 'l',
@@ -106,12 +123,25 @@ function App() {
                 format: 'a5'
             });
 
-            const imgWidth = 210; // A5 Landscape Width
-            const elementWidth = templateRef.current.offsetWidth;
-            const elementHeight = templateRef.current.offsetHeight;
-            const imgHeight = (elementHeight * imgWidth) / elementWidth;
+            // List of pages to capture
+            const pageSelectors = ['.paper-a5', '.paper-a5-page2'];
 
-            pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
+            for (let i = 0; i < pageSelectors.length; i++) {
+                const element = templateRef.current.querySelector(pageSelectors[i]);
+                if (!element) continue;
+
+                const dataUrl = await toJpeg(element, options);
+
+                if (i > 0) pdf.addPage();
+
+                const imgWidth = 210; // A5 Landscape Width
+                const elementWidth = element.offsetWidth;
+                const elementHeight = element.offsetHeight;
+                const imgHeight = (elementHeight * imgWidth) / elementWidth;
+
+                pdf.addImage(dataUrl, 'JPEG', 0, 0, imgWidth, imgHeight);
+            }
+
             pdf.save(`DieuTri_${patientData.name || 'BenhNhan'}.pdf`);
         } catch (err) {
             console.error("PDF Export Error:", err);
@@ -138,9 +168,10 @@ function App() {
                 </button>
                 <button
                     onClick={handleSavePatient}
-                    style={btnStyle('#007bff')}
+                    disabled={isSaving}
+                    style={btnStyle(isSaving ? '#cccccc' : '#007bff')}
                 >
-                    Lưu
+                    {isSaving ? 'Đang lưu...' : 'Lưu'}
                 </button>
                 <button
                     onClick={handleExportPDF}
