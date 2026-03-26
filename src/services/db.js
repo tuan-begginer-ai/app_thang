@@ -1,19 +1,9 @@
-let ipcRenderer;
-
-try {
-    if (window.require) {
-        ipcRenderer = window.require('electron').ipcRenderer;
-    }
-} catch (e) {
-    console.warn('Electron IPC not available. Database features will be disabled.');
-}
-
 const invokeOrMock = (channel, ...args) => {
-    if (ipcRenderer) {
-        return ipcRenderer.invoke(channel, ...args);
+    if (window.dbAPI) {
+        return window.dbAPI.invoke(channel, ...args);
     }
-    console.warn(`Mock DB call: ${channel}`, args);
-    return Promise.resolve([]); // Return empty result or appropriate mock
+    console.warn(`Mock DB call or Electron API not available: ${channel}`, args);
+    return Promise.resolve([]);
 };
 
 export const dbService = {

@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import '../styles/PrintTemplate.css';
 import logoImg from '../assets/logo-quoc-Binh-ena.png';
-import chartImg from '../assets/dental-chart-static.png';
+import chartImg from '../assets/Gemini_Generated_Image_5l98an5l98an5l98.png';
 // import ToothChart from './ToothChart';
 
 const PrintTemplate = forwardRef(({ data }, ref) => {
@@ -56,6 +56,7 @@ const PrintTemplate = forwardRef(({ data }, ref) => {
                 <div className="a5-form-left">
                     <div className="a5-line-row"><span className="a5-label">Họ và tên:</span><span className="a5-line"></span></div>
                     <div className="a5-line-row"><span className="a5-label">Địa chỉ:</span><span className="a5-line"></span></div>
+                    <div className="a5-line-full"></div>
                     <div className="a5-line-row"><span className="a5-label">Tiền sử bệnh:</span><span className="a5-line"></span></div>
                     <div className="a5-line-row"><span className="a5-label">Chẩn đoán:</span><span className="a5-line"></span></div>
                     <div className="a5-line-row"><span className="a5-label">Kế hoạch điều trị:</span><span className="a5-line"></span></div>
@@ -70,19 +71,27 @@ const PrintTemplate = forwardRef(({ data }, ref) => {
                 </div>
 
                 {/* Data Overlays - Adjusted for baseline alignment (matches DOB at 141px) */}
-                <div className="field-overlay" style={{ top: '144px', left: '85px', width: '220px' }}>{data.name}</div>
-                <div className="field-overlay" style={{ top: '165px', left: '70px', width: '230px' }}>{data.address}</div>
-                <div className="field-overlay" style={{ top: '186px', left: '103px', width: '200px' }}>{data.history}</div>
-                <div className="field-overlay" style={{ top: '206.5px', left: '90px', width: '210px', zIndex: 20 }}>{data.diagnosis}</div>
+                <div className="field-overlay" style={{ top: '143px', left: '85px', width: '220px' }}>{data.name}</div>
+                <div className="field-overlay" style={{
+                    top: '161px',
+                    left: '22px',
+                    width: '269px',
+                    whiteSpace: 'normal',
+                    overflowWrap: 'break-word',
+                    textIndent: '48px',
+                    lineHeight: '19px'
+                }}>{data.address}</div>
+                <div className="field-overlay" style={{ top: '198px', left: '103px', width: '200px' }}>{data.history}</div>
+                <div className="field-overlay" style={{ top: '217px', left: '90px', width: '210px', zIndex: 20 }}>{data.diagnosis}</div>
                 {/* Keeping treatment slightly right to avoid overlap */}
                 <div className="field-overlay" style={{
-                    top: '226px',
+                    top: '235px',
                     left: '22px',
                     width: '269px',
                     whiteSpace: 'normal',
                     overflowWrap: 'break-word',
                     textIndent: '103px',
-                    lineHeight: '21px'
+                    lineHeight: '19px'
                 }}>{data.treatment}</div>
 
                 {/* Right Block - DOB Split */}
@@ -113,8 +122,8 @@ const PrintTemplate = forwardRef(({ data }, ref) => {
                 </div>
 
                 {/* Keeping top fix for Phone/Occupation */}
-                <div className="field-overlay" style={{ top: '156px', left: '335px', width: '100px' }}>{data.phone}</div>
-                <div className="field-overlay" style={{ top: '156px', left: '495px', width: '100px' }}>{data.occupation}</div>
+                <div className="field-overlay" style={{ top: '155px', left: '335px', width: '100px' }}>{data.phone}</div>
+                <div className="field-overlay" style={{ top: '155px', left: '495px', width: '100px' }}>{data.occupation}</div>
 
 
                 {/* Dental Chart Labels */}
@@ -158,7 +167,8 @@ const PrintTemplate = forwardRef(({ data }, ref) => {
                             width: '100%',
                             height: '100%',
                             objectFit: 'contain',
-                            mixBlendMode: 'multiply'
+                            mixBlendMode: 'multiply',
+                            filter: 'brightness(1.08) contrast(1.1)'
                         }}
                     />
                 </div>

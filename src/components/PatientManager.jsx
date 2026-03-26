@@ -11,7 +11,8 @@ const PatientManager = ({ isOpen, onClose, onSelectPatient }) => {
         setLoading(true);
         try {
             const result = await dbService.searchPatients(query);
-            setPatients(result);
+            console.log(`UI: Search query "${query}" returned ${result?.length || 0} results`);
+            setPatients(result || []);
         } catch (error) {
             console.error("Failed to load patients", error);
         } finally {

@@ -3,7 +3,9 @@ import Layout from './components/Layout';
 import PatientForm from './components/PatientForm';
 import PrintTemplate from './components/PrintTemplate';
 import PatientManager from './components/PatientManager';
+import SignatureRequest from './components/SignatureRequest';
 import { dbService } from './services/db';
+import BoldSignTest from './components/BoldSignTest';
 // import ToothChart from './components/ToothChart';
 import jsPDF from 'jspdf';
 
@@ -54,19 +56,43 @@ function App() {
 
         setIsSaving(true);
         try {
-            let saved;
-            if (patientData.id) {
-                await dbService.updatePatient(patientData.id, patientData);
-                saved = patientData;
-                alert('Cập nhật thành công!');
+            let targetId = patientData.id;
+
+            // Nếu là bệnh nhân mới (chưa có id), kiểm tra xem tên đã tồn tại trong DB chưa
+            if (!targetId) {
+                const existing = await dbService.searchPatients(patientData.name);
+                const match = existing.find(p => p.name.trim().toLowerCase() === patientData.name.trim().toLowerCase());
+
+                if (match) {
+                    if (window.confirm(`Bệnh nhân "${patientData.name}" đã có hồ sơ. Bạn có muốn CẬP NHẬT vào hồ sơ cũ không?`)) {
+                        targetId = match.id;
+                    } else {
+                        setIsSaving(false);
+                        return;
+                    }
+                }
+            }
+
+            let response;
+            if (targetId) {
+                response = await dbService.updatePatient(targetId, patientData);
+                setPatientData(prev => ({ ...prev, id: targetId }));
             } else {
-                saved = await dbService.addPatient(patientData);
-                setPatientData(prev => ({ ...prev, id: saved.id }));
-                alert('Lưu mới thành công!');
+                response = await dbService.addPatient(patientData);
+                if (response && response.id) {
+                    setPatientData(prev => ({ ...prev, id: response.id }));
+                }
+            }
+
+            // Kiểm tra lỗi Excel từ phản hồi của backend
+            if (response && response.excelError) {
+                alert(`Đã lưu vào Database, nhưng KHÔNG THỂ cập nhật file Excel.\n\nLý do: ${response.excelError}\n\n(Vui lòng Đóng file patients.xlsx nếu đang mở và thử Lưu lại)`);
+            } else {
+                alert('Lưu dữ liệu thành công!');
             }
         } catch (error) {
-            console.error(error);
-            alert('Có lỗi khi lưu dữ liệu!');
+            console.error("Save Error:", error);
+            alert('Có lỗi hệ thống khi lưu dữ liệu!');
         } finally {
             setIsSaving(false);
         }
@@ -89,14 +115,12 @@ function App() {
 
     // IPC Listener for Menu Actions
     useEffect(() => {
-        // Only run in Electron environment
-        if (window.require) {
+        if (window.dbAPI) {
             try {
-                const { ipcRenderer } = window.require('electron');
-                const handlePrintCall = () => ipcRenderer.send('print-to-paper');
-                ipcRenderer.on('menu-action-print', handlePrintCall);
+                const handlePrintCall = () => window.dbAPI.send('print-to-paper');
+                window.dbAPI.on('menu-action-print', handlePrintCall);
                 return () => {
-                    ipcRenderer.removeListener('menu-action-print', handlePrintCall);
+                    window.dbAPI.removeListener('menu-action-print', handlePrintCall);
                 };
             } catch (e) {
                 console.warn('Electron IPC not available', e);
@@ -108,13 +132,13 @@ function App() {
         if (!templateRef.current) return;
 
         try {
-            const { toJpeg } = await import('html-to-image');
+            const { toPng } = await import('html-to-image');
 
-            // Configuration for quality and size
+            // Configuration for maximum sharpness
             const options = {
-                quality: 0.95,
                 cacheBust: true,
-                pixelRatio: 1.5 // Balanced between quality and size
+                pixelRatio: 3, // High resolution (3x)
+                backgroundColor: '#f9f5f2' // Ensure consistent background
             };
 
             const pdf = new jsPDF({
@@ -123,23 +147,20 @@ function App() {
                 format: 'a5'
             });
 
-            // List of pages to capture
             const pageSelectors = ['.paper-a5', '.paper-a5-page2'];
-
             for (let i = 0; i < pageSelectors.length; i++) {
                 const element = templateRef.current.querySelector(pageSelectors[i]);
                 if (!element) continue;
 
-                const dataUrl = await toJpeg(element, options);
-
+                const dataUrl = await toPng(element, options);
                 if (i > 0) pdf.addPage();
 
-                const imgWidth = 210; // A5 Landscape Width
+                const imgWidth = 210;
                 const elementWidth = element.offsetWidth;
                 const elementHeight = element.offsetHeight;
                 const imgHeight = (elementHeight * imgWidth) / elementWidth;
 
-                pdf.addImage(dataUrl, 'JPEG', 0, 0, imgWidth, imgHeight);
+                pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
             }
 
             pdf.save(`DieuTri_${patientData.name || 'BenhNhan'}.pdf`);
@@ -149,10 +170,61 @@ function App() {
         }
     };
 
+    const generatePDFBase64 = async () => {
+        if (!templateRef.current) return null;
+
+        try {
+            const { toPng } = await import('html-to-image');
+            const options = { 
+                cacheBust: true,
+                pixelRatio: 3,
+                backgroundColor: '#f9f5f2'
+            };
+
+            const pdf = new jsPDF({
+                orientation: 'l',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const pageSelectors = ['.paper-a5', '.paper-a5-page2'];
+            for (let i = 0; i < pageSelectors.length; i++) {
+                const element = templateRef.current.querySelector(pageSelectors[i]);
+                if (!element) continue;
+
+                const dataUrl = await toPng(element, options);
+                if (i > 0) pdf.addPage();
+
+                const imgWidth = 297; // A4 Landscape Width
+                const elementWidth = element.offsetWidth;
+                const elementHeight = element.offsetHeight;
+                const imgHeight = (elementHeight * imgWidth) / elementWidth;
+
+                pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
+            }
+
+            const base64 = pdf.output('datauristring');
+            return base64;
+        } catch (err) {
+            console.error("Generate PDF Base64 Error:", err);
+            return null;
+        }
+    };
+
     return (
         <div className="app-container">
             <div className="toolbar" style={{
-                position: 'fixed', top: 20, right: 20, zIndex: 1000, display: 'flex', gap: '10px'
+                position: 'fixed',
+                top: 20,
+                right: 20,
+                zIndex: 1000,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                padding: '10px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '8px',
+                backdropFilter: 'blur(5px)'
             }}>
                 <button
                     onClick={() => setManagerOpen(true)}
@@ -183,7 +255,13 @@ function App() {
 
             <Layout
                 formSection={
-                    <PatientForm data={patientData} onChange={handleFormChange} />
+                    <>
+                        <PatientForm data={patientData} onChange={handleFormChange} />
+                        <SignatureRequest 
+                            patientName={patientData.name || 'Bệnh nhân'} 
+                            getPdfBase64={generatePDFBase64} 
+                        />
+                    </>
                 }
                 previewSection={
                     <PrintTemplate ref={templateRef} data={patientData} />
@@ -195,20 +273,30 @@ function App() {
                 onClose={() => setManagerOpen(false)}
                 onSelectPatient={handleSelectPatient}
             />
+
+            {/* BoldSign Test Component floating at bottom right */}
+            <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 10000 }}>
+                <BoldSignTest />
+            </div>
         </div>
     );
 }
 
 const btnStyle = (bg) => ({
-    padding: '10px 20px',
+    width: '65px',
+    height: '28px',
     background: bg,
     color: 'white',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.2)'
+    fontSize: '10px',
+    fontWeight: '600',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+    transition: 'all 0.2s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
 });
 
 export default App;
