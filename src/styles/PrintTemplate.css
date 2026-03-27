@@ -461,8 +461,8 @@
     border-radius: 5px;
     box-sizing: border-box;
     background: #f9f5f2;
-    height: 395px;
-    /* FILL PAGE: 420px (total) - 13px (top) - 13px (bottom) */
+    height: auto; /* Shrink to fit rows exactly */
+    top: 15px;
 }
 
 .p2-row {
@@ -478,8 +478,7 @@
 */
 
 .p2-header-row {
-    height: 36px;
-    /* Line 51 */
+    height: 32px;
     background: rgba(255, 255, 255, 0.05);
     /* Line 76 */
     font-weight: 600;
@@ -488,10 +487,8 @@
 }
 
 .p2-data-row {
-    /* height: 30px; REMOVED FIXED HEIGHT */
-    flex: 1;
-    /* Automatically expand to fill remaining space */
-    /* Line 406 */
+    height: 31px;
+    /* Fixed height to prevent row expansion from pushing table out */
     background: rgba(255, 255, 255, 0.002);
 }
 
@@ -505,8 +502,8 @@
     justify-content: center;
     /* Center Horizontally */
     box-sizing: border-box;
-    padding: 4px;
-    /* Slight padding */
+    padding: 3px 4px;
+    /* Reduced vertical padding to fit more rows */
 
     font-family: 'Inter', sans-serif;
     color: #5886C3;
@@ -524,8 +521,8 @@
 /* Text Styling */
 /* Use 12pt as requested by user, though A5-2 said 12px */
 .p2-text {
-    font-size: 10pt;
-    font-weight: 500;
+    font-size: 9pt;
+    /* Smaller to ensure content fits fixed row height */
     width: 100%;
     /* Ensure text takes full width of cell to wrap correctly */
 }
@@ -584,7 +581,7 @@
     /* Để nguyên văn bản gốc */
     font-weight: 500;
     /* Độ đậm chữ */
-    font-size: 11pt;
+    font-size: 10pt;
     /* Cỡ chữ */
     color: #2830CB;
     /* Màu chữ */

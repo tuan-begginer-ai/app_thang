@@ -10,17 +10,19 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "lint:security": "eslint . --plugin security --rule \"security/detect-object-injection: error\"",
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on tcp:5173 && electron .\"",
-    "electron:build": "npm run build && electron-builder"
+    "electron:build": "npm run build && electron-builder",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@types/express": "^5.0.6",
     "axios": "^1.13.6",
     "better-sqlite3": "^12.5.0",
-    "crypto-js": "^4.2.0",
     "dotenv": "^17.3.1",
-    "express": "^5.2.1",
+    "electron-updater": "^6.8.3",
     "form-data": "^4.0.5",
     "html-to-image": "^1.11.13",
     "jspdf": "^2.5.1",
@@ -29,6 +31,10 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^25.5.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
@@ -36,10 +42,14 @@
     "electron": "^39.2.6",
     "electron-builder": "^26.0.12",
     "eslint": "^8.57.0",
+    "eslint-plugin-no-secrets": "^2.3.3",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "eslint-plugin-security": "^4.0.0",
+    "jsdom": "^29.0.1",
     "vite": "^5.2.0",
+    "vitest": "^4.1.2",
     "wait-on": "^9.0.3"
   },
   "build": {

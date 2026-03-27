@@ -6,7 +6,7 @@ import chartImg from '../assets/Gemini_Generated_Image_5l98an5l98an5l98.png';
 
 const PrintTemplate = forwardRef(({ data }, ref) => {
     // Generate empty rows for Page 2
-    const rows = Array(11).fill(null); // 9 rows to fit nicely
+    const rows = Array(10).fill(null); // 10 rows to fit nicely within A5 height
 
     return (
         <div className="print-template-container" ref={ref}>

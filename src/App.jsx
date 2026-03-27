@@ -4,223 +4,79 @@ import PatientForm from './components/PatientForm';
 import PrintTemplate from './components/PrintTemplate';
 import PatientManager from './components/PatientManager';
 import SignatureRequest from './components/SignatureRequest';
-import { dbService } from './services/db';
 import BoldSignTest from './components/BoldSignTest';
 import BoldSignCallback from './components/BoldSignCallback';
-// import ToothChart from './components/ToothChart';
-import jsPDF from 'jspdf';
 
+import { dbService } from './services/db';
+import { pdfService } from './services/pdfService';
+import { usePatientData } from './hooks/usePatientData';
+
+/**
+ * Main Application Component
+ * Coordinates between Patient Management, Form Entry, and Print Preview.
+ */
 function App() {
     // Check if we are in the callback route
     if (window.location.pathname === '/boldsign/callback' || window.location.search.includes('code=')) {
         return <BoldSignCallback />;
     }
 
-    const [patientData, setPatientData] = useState({
-        id: null,
-        name: '',
-        dob: '',
-        gender: 'Nam',
-        address: '',
-        phone: '',
-        occupation: '',
-        history: '',
-        diagnosis: '',
-        treatment: '',
-        treatmentHistory: Array(11).fill({ date: '', diagnosis: '', doctor: '', price: '', note: '' })
-    });
+    const {
+        patientData,
+        isSaving,
+        handleFormChange,
+        handleNewPatient,
+        handleSelectPatient,
+        savePatient
+    } = usePatientData(dbService);
 
     const [isManagerOpen, setManagerOpen] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
     const templateRef = useRef(null);
 
-    const handleFormChange = (name, value) => {
-        setPatientData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleNewPatient = () => {
-        setPatientData({
-            id: null,
-            name: '',
-            dob: '',
-            gender: 'Nam',
-            address: '',
-            phone: '',
-            occupation: '',
-            history: '',
-            diagnosis: '',
-            treatment: '',
-            treatmentHistory: Array(11).fill({ date: '', diagnosis: '', doctor: '', price: '', note: '' })
-        });
-    };
-
-    const handleSavePatient = async () => {
-        if (!patientData.name) {
-            alert('Vui lòng nhập tên bệnh nhân!');
-            return;
-        }
-
-        setIsSaving(true);
+    /**
+     * Handles patient data persistence and UI feedback.
+     */
+    const onSave = async () => {
         try {
-            let targetId = patientData.id;
+            const { success, cancelled, excelError } = await savePatient();
+            if (cancelled) return;
 
-            // Nếu là bệnh nhân mới (chưa có id), kiểm tra xem tên đã tồn tại trong DB chưa
-            if (!targetId) {
-                const existing = await dbService.searchPatients(patientData.name);
-                const match = existing.find(p => p.name.trim().toLowerCase() === patientData.name.trim().toLowerCase());
-
-                if (match) {
-                    if (window.confirm(`Bệnh nhân "${patientData.name}" đã có hồ sơ. Bạn có muốn CẬP NHẬT vào hồ sơ cũ không?`)) {
-                        targetId = match.id;
-                    } else {
-                        setIsSaving(false);
-                        return;
-                    }
+            if (success) {
+                if (excelError) {
+                    alert(`Đã lưu vào Database, nhưng KHÔNG THỂ cập nhật file Excel.\n\nLý do: ${excelError}\n\n(Vui lòng Đóng file patients.xlsx nếu đang mở và thử Lưu lại)`);
+                } else {
+                    alert('Lưu dữ liệu thành công!');
                 }
-            }
-
-            let response;
-            if (targetId) {
-                response = await dbService.updatePatient(targetId, patientData);
-                setPatientData(prev => ({ ...prev, id: targetId }));
-            } else {
-                response = await dbService.addPatient(patientData);
-                if (response && response.id) {
-                    setPatientData(prev => ({ ...prev, id: response.id }));
-                }
-            }
-
-            // Kiểm tra lỗi Excel từ phản hồi của backend
-            if (response && response.excelError) {
-                alert(`Đã lưu vào Database, nhưng KHÔNG THỂ cập nhật file Excel.\n\nLý do: ${response.excelError}\n\n(Vui lòng Đóng file patients.xlsx nếu đang mở và thử Lưu lại)`);
-            } else {
-                alert('Lưu dữ liệu thành công!');
             }
         } catch (error) {
-            console.error("Save Error:", error);
-            alert('Có lỗi hệ thống khi lưu dữ liệu!');
-        } finally {
-            setIsSaving(false);
+            alert(error.message || 'Có lỗi hệ thống khi lưu dữ liệu!');
         }
     };
 
-    const handleSelectPatient = (patient) => {
-        // Ensure treatmentHistory has 11 rows if it's missing or short
-        const history = patient.treatmentHistory || [];
-        const paddedHistory = [...history];
-        while (paddedHistory.length < 11) {
-            paddedHistory.push({ date: '', diagnosis: '', doctor: '', price: '', note: '' });
+    /**
+     * Orchestrates PDF export via pdfService.
+     */
+    const onExportPDF = async () => {
+        try {
+            await pdfService.exportPDF(templateRef, patientData.name);
+        } catch (error) {
+            alert(error.message);
         }
-
-        setPatientData({
-            ...patient,
-            treatmentHistory: paddedHistory
-        });
-        setManagerOpen(false);
     };
 
-    // IPC Listener for Menu Actions
+    /**
+     * Inter-Process Communication (IPC) for Electron Menu Actions
+     */
     useEffect(() => {
-        if (window.dbAPI) {
-            try {
-                const handlePrintCall = () => window.dbAPI.send('print-to-paper');
-                window.dbAPI.on('menu-action-print', handlePrintCall);
-                return () => {
-                    window.dbAPI.removeListener('menu-action-print', handlePrintCall);
-                };
-            } catch (e) {
-                console.warn('Electron IPC not available', e);
-            }
-        }
+        if (!window.dbAPI) return;
+
+        const handlePrint = () => window.dbAPI.send('print-to-paper');
+        window.dbAPI.on('menu-action-print', handlePrint);
+
+        return () => {
+            window.dbAPI.removeListener('menu-action-print', handlePrint);
+        };
     }, []);
-
-    const handleExportPDF = async () => {
-        if (!templateRef.current) return;
-
-        try {
-            const { toJpeg } = await import('html-to-image');
-
-            // Configuration for good sharpness but smaller size
-            const options = {
-                cacheBust: true,
-                pixelRatio: 2, // 2x is enough for high quality without extreme file size
-                quality: 0.8,   // JPEG quality settings
-                backgroundColor: '#f9f5f2'
-            };
-
-            const pdf = new jsPDF({
-                orientation: 'l',
-                unit: 'mm',
-                format: 'a5',
-                compress: true // Enable jsPDF compression
-            });
-
-            const pageSelectors = ['.paper-a5', '.paper-a5-page2'];
-            for (let i = 0; i < pageSelectors.length; i++) {
-                const element = templateRef.current.querySelector(pageSelectors[i]);
-                if (!element) continue;
-
-                // Using toJpeg for significantly smaller size than PNG
-                const dataUrl = await toJpeg(element, options);
-                if (i > 0) pdf.addPage();
-
-                const imgWidth = 210;
-                const elementWidth = element.offsetWidth;
-                const elementHeight = element.offsetHeight;
-                const imgHeight = (elementHeight * imgWidth) / elementWidth;
-
-                pdf.addImage(dataUrl, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
-            }
-
-            pdf.save(`DieuTri_${patientData.name || 'BenhNhan'}.pdf`);
-        } catch (err) {
-            console.error("PDF Export Error:", err);
-            alert("Lỗi xuất PDF: " + err.message);
-        }
-    };
-
-    const generatePDFBase64 = async () => {
-        if (!templateRef.current) return null;
-
-        try {
-            const { toJpeg } = await import('html-to-image');
-            const options = { 
-                cacheBust: true,
-                pixelRatio: 2,
-                quality: 0.8,
-                backgroundColor: '#f9f5f2'
-            };
-
-            const pdf = new jsPDF({
-                orientation: 'l',
-                unit: 'mm',
-                format: 'a4',
-                compress: true
-            });
-
-            const pageSelectors = ['.paper-a5', '.paper-a5-page2'];
-            for (let i = 0; i < pageSelectors.length; i++) {
-                const element = templateRef.current.querySelector(pageSelectors[i]);
-                if (!element) continue;
-
-                const dataUrl = await toJpeg(element, options);
-                if (i > 0) pdf.addPage();
-
-                const imgWidth = 297; // A4 Landscape Width
-                const elementWidth = element.offsetWidth;
-                const elementHeight = element.offsetHeight;
-                const imgHeight = (elementHeight * imgWidth) / elementWidth;
-
-                pdf.addImage(dataUrl, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
-            }
-
-            const base64 = pdf.output('datauristring');
-            return base64;
-        } catch (err) {
-            console.error("Generate PDF Base64 Error:", err);
-            return null;
-        }
-    };
 
     return (
         <div className="app-container">
@@ -250,14 +106,14 @@ function App() {
                     Tạo mới
                 </button>
                 <button
-                    onClick={handleSavePatient}
+                    onClick={onSave}
                     disabled={isSaving}
                     style={btnStyle(isSaving ? '#cccccc' : '#007bff')}
                 >
                     {isSaving ? 'Đang lưu...' : 'Lưu'}
                 </button>
                 <button
-                    onClick={handleExportPDF}
+                    onClick={onExportPDF}
                     style={btnStyle('#28a745')}
                 >
                     Xuất PDF
@@ -270,7 +126,7 @@ function App() {
                         <PatientForm data={patientData} onChange={handleFormChange} />
                         <SignatureRequest 
                             patientName={patientData.name || 'Bệnh nhân'} 
-                            getPdfBase64={generatePDFBase64} 
+                            getPdfBase64={() => pdfService.generatePDFBase64(templateRef)} 
                         />
                     </>
                 }

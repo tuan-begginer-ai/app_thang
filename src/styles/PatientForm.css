@@ -21,16 +21,17 @@
     flex: 1;
 }
 
-label {
+.patient-form label {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
     color: #555;
+    font-size: 14px;
 }
 
-input[type="text"],
-input[type="number"],
-textarea {
+.patient-form input[type="text"],
+.patient-form input[type="number"],
+.patient-form textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid var(--border-color);
@@ -40,8 +41,8 @@ textarea {
     transition: border-color 0.2s;
 }
 
-input:focus,
-textarea:focus {
+.patient-form input:focus,
+.patient-form textarea:focus {
     border-color: var(--primary-color);
     outline: none;
 }
@@ -88,7 +89,6 @@ textarea:focus {
     padding: 6px;
     width: 100%;
     box-sizing: border-box;
-    /* Ensure padding doesn't affect width */
     background: transparent;
 }
 

@@ -14,8 +14,11 @@ export default function SignatureRequest({ patientName, getPdfBase64 }) {
   useEffect(() => {
     refreshLoggedInUsers()
     checkAuthMethod()
-    // Poll every 3s so list stays in sync when user logs in via the Config panel
-    const interval = setInterval(refreshLoggedInUsers, 3000)
+    // Poll every 3s to keep authMethod and users in sync with settings file
+    const interval = setInterval(() => {
+      refreshLoggedInUsers()
+      checkAuthMethod()
+    }, 3000)
     return () => clearInterval(interval)
   }, [])
 
@@ -54,10 +57,13 @@ export default function SignatureRequest({ patientName, getPdfBase64 }) {
       return
     }
 
-    // Kiểm tra xem email bác sĩ đã đăng nhập chưa nếu dùng Auth Code
-    // Luôn lấy danh sách mới nhất trước khi kiểm tra
-    if (authMethod === 'authorization_code') {
+    const currentSettings = await window.boldSignAPI.getSettings()
+    const currentMethod = currentSettings.authMethod || 'client_credentials'
+    console.log(`[Renderer] [handleSend] AuthMode from file: "${currentMethod}", InputEmail: "${doctorEmail}"`);
+    
+    if (currentMethod === 'authorization_code') {
       const freshUsers = window.boldSignAPI?.getLoggedInUsers ? await window.boldSignAPI.getLoggedInUsers() : []
+      console.log(`[Renderer] [handleSend] Logged in users:`, freshUsers);
       setLoggedInUsers(freshUsers)
       if (!freshUsers.includes(doctorEmail)) {
         alert(`Email "${doctorEmail}" chưa được đăng nhập BoldSign.\n\nVui lòng vào bảng Cấu hình (góc dưới phải) → nhấn "+ Đăng nhập mới" và nhấn Allow.`)
@@ -101,11 +107,15 @@ export default function SignatureRequest({ patientName, getPdfBase64 }) {
       return
     }
 
-    if (authMethod === 'authorization_code') {
+    const currentSettings = await window.boldSignAPI.getSettings()
+    const currentMethod = currentSettings.authMethod || 'client_credentials'
+
+    if (currentMethod === 'authorization_code') {
       const freshUsers = window.boldSignAPI?.getLoggedInUsers ? await window.boldSignAPI.getLoggedInUsers() : []
       setLoggedInUsers(freshUsers)
       if (!freshUsers.includes(doctorEmail)) {
         alert(`Email "${doctorEmail}" chưa được đăng nhập BoldSign.\n\nVui lòng vào bảng Cấu hình (góc dưới phải) → nhấn "+ Đăng nhập mới" và nhấn Allow.`)
+        setLoadingEmbedded(false)
         return
       }
     }
