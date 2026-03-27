@@ -2,11 +2,17 @@ const { contextBridge, ipcRenderer } = require('electron')
 
 // Expose BoldSign API
 contextBridge.exposeInMainWorld('boldSignAPI', {
-    testConnection: () => ipcRenderer.invoke('boldsign:test-connection'),
+    testConnection: (payload) => ipcRenderer.invoke('boldsign:test-connection', payload),
     sendForSignature: (payload) => ipcRenderer.invoke('boldsign:send-for-signature', payload),
-    checkStatus: (documentId) => ipcRenderer.invoke('boldsign:check-status', { documentId }),
-    downloadSigned: (documentId) => ipcRenderer.invoke('boldsign:download-signed', { documentId }),
+    checkStatus: (payload) => ipcRenderer.invoke('boldsign:check-status', payload),
+    downloadSigned: (payload) => ipcRenderer.invoke('boldsign:download-signed', payload),
     createEmbeddedRequest: (payload) => ipcRenderer.invoke('boldsign:create-embedded-request', payload),
+    startLogin: (payload) => ipcRenderer.invoke('boldsign:start-login', payload),
+    exchangeCode: (code) => ipcRenderer.invoke('boldsign:exchange-code', code),
+    getLoggedInUsers: () => ipcRenderer.invoke('boldsign:get-logged-in-users'),
+    logoutUser: (email) => ipcRenderer.invoke('boldsign:logout-user', email),
+    getSettings: () => ipcRenderer.invoke('settings:get'),
+    saveSettings: (data) => ipcRenderer.invoke('settings:save', data),
 })
 
 // Expose Database API to maintain compatibility with existing code

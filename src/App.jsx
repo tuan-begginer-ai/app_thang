@@ -6,10 +6,16 @@ import PatientManager from './components/PatientManager';
 import SignatureRequest from './components/SignatureRequest';
 import { dbService } from './services/db';
 import BoldSignTest from './components/BoldSignTest';
+import BoldSignCallback from './components/BoldSignCallback';
 // import ToothChart from './components/ToothChart';
 import jsPDF from 'jspdf';
 
 function App() {
+    // Check if we are in the callback route
+    if (window.location.pathname === '/boldsign/callback' || window.location.search.includes('code=')) {
+        return <BoldSignCallback />;
+    }
+
     const [patientData, setPatientData] = useState({
         id: null,
         name: '',
@@ -132,19 +138,21 @@ function App() {
         if (!templateRef.current) return;
 
         try {
-            const { toPng } = await import('html-to-image');
+            const { toJpeg } = await import('html-to-image');
 
-            // Configuration for maximum sharpness
+            // Configuration for good sharpness but smaller size
             const options = {
                 cacheBust: true,
-                pixelRatio: 3, // High resolution (3x)
-                backgroundColor: '#f9f5f2' // Ensure consistent background
+                pixelRatio: 2, // 2x is enough for high quality without extreme file size
+                quality: 0.8,   // JPEG quality settings
+                backgroundColor: '#f9f5f2'
             };
 
             const pdf = new jsPDF({
                 orientation: 'l',
                 unit: 'mm',
-                format: 'a5'
+                format: 'a5',
+                compress: true // Enable jsPDF compression
             });
 
             const pageSelectors = ['.paper-a5', '.paper-a5-page2'];
@@ -152,7 +160,8 @@ function App() {
                 const element = templateRef.current.querySelector(pageSelectors[i]);
                 if (!element) continue;
 
-                const dataUrl = await toPng(element, options);
+                // Using toJpeg for significantly smaller size than PNG
+                const dataUrl = await toJpeg(element, options);
                 if (i > 0) pdf.addPage();
 
                 const imgWidth = 210;
@@ -160,7 +169,7 @@ function App() {
                 const elementHeight = element.offsetHeight;
                 const imgHeight = (elementHeight * imgWidth) / elementWidth;
 
-                pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.addImage(dataUrl, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
             }
 
             pdf.save(`DieuTri_${patientData.name || 'BenhNhan'}.pdf`);
@@ -174,17 +183,19 @@ function App() {
         if (!templateRef.current) return null;
 
         try {
-            const { toPng } = await import('html-to-image');
+            const { toJpeg } = await import('html-to-image');
             const options = { 
                 cacheBust: true,
-                pixelRatio: 3,
+                pixelRatio: 2,
+                quality: 0.8,
                 backgroundColor: '#f9f5f2'
             };
 
             const pdf = new jsPDF({
                 orientation: 'l',
                 unit: 'mm',
-                format: 'a4'
+                format: 'a4',
+                compress: true
             });
 
             const pageSelectors = ['.paper-a5', '.paper-a5-page2'];
@@ -192,7 +203,7 @@ function App() {
                 const element = templateRef.current.querySelector(pageSelectors[i]);
                 if (!element) continue;
 
-                const dataUrl = await toPng(element, options);
+                const dataUrl = await toJpeg(element, options);
                 if (i > 0) pdf.addPage();
 
                 const imgWidth = 297; // A4 Landscape Width
@@ -200,7 +211,7 @@ function App() {
                 const elementHeight = element.offsetHeight;
                 const imgHeight = (elementHeight * imgWidth) / elementWidth;
 
-                pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.addImage(dataUrl, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
             }
 
             const base64 = pdf.output('datauristring');

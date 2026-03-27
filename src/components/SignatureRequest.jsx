@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function SignatureRequest({ patientName, getPdfBase64 }) {
   const [doctorName,  setDoctorName]  = useState('Bác sĩ Phan Quốc Bình')
@@ -8,12 +8,61 @@ export default function SignatureRequest({ patientName, getPdfBase64 }) {
   const [result,          setResult]          = useState(null)
   const [documentId,  setDocumentId]  = useState(null)
   const [status,      setStatus]      = useState(null)
+  const [loggedInUsers, setLoggedInUsers] = useState([])
+  const [authMethod, setAuthMethod] = useState('client_credentials')
+
+  useEffect(() => {
+    refreshLoggedInUsers()
+    checkAuthMethod()
+    // Poll every 3s so list stays in sync when user logs in via the Config panel
+    const interval = setInterval(refreshLoggedInUsers, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const checkAuthMethod = async () => {
+    if (window.boldSignAPI) {
+      const settings = await window.boldSignAPI.getSettings()
+      setAuthMethod(settings.authMethod || 'client_credentials')
+    }
+  }
+
+  const refreshLoggedInUsers = async () => {
+    if (window.boldSignAPI && window.boldSignAPI.getLoggedInUsers) {
+      const users = await window.boldSignAPI.getLoggedInUsers()
+      setLoggedInUsers(users)
+    }
+  }
+
+  const handleLogin = async () => {
+    if (!window.boldSignAPI) return
+    const res = await window.boldSignAPI.startLogin()
+    if (res.success) {
+      refreshLoggedInUsers()
+    }
+  }
+
+  const handleLogout = async (email) => {
+    if (!window.boldSignAPI) return
+    await window.boldSignAPI.logoutUser(email)
+    refreshLoggedInUsers()
+  }
 
   // Gửi phiếu khám lên BoldSign để Bác sĩ ký
   const handleSend = async () => {
     if (!doctorName || !doctorEmail) {
       alert('Vui lòng nhập tên và email Bác sĩ')
       return
+    }
+
+    // Kiểm tra xem email bác sĩ đã đăng nhập chưa nếu dùng Auth Code
+    // Luôn lấy danh sách mới nhất trước khi kiểm tra
+    if (authMethod === 'authorization_code') {
+      const freshUsers = window.boldSignAPI?.getLoggedInUsers ? await window.boldSignAPI.getLoggedInUsers() : []
+      setLoggedInUsers(freshUsers)
+      if (!freshUsers.includes(doctorEmail)) {
+        alert(`Email "${doctorEmail}" chưa được đăng nhập BoldSign.\n\nVui lòng vào bảng Cấu hình (góc dưới phải) → nhấn "+ Đăng nhập mới" và nhấn Allow.`)
+        return
+      }
     }
 
     if (!window.boldSignAPI) {
@@ -52,6 +101,15 @@ export default function SignatureRequest({ patientName, getPdfBase64 }) {
       return
     }
 
+    if (authMethod === 'authorization_code') {
+      const freshUsers = window.boldSignAPI?.getLoggedInUsers ? await window.boldSignAPI.getLoggedInUsers() : []
+      setLoggedInUsers(freshUsers)
+      if (!freshUsers.includes(doctorEmail)) {
+        alert(`Email "${doctorEmail}" chưa được đăng nhập BoldSign.\n\nVui lòng vào bảng Cấu hình (góc dưới phải) → nhấn "+ Đăng nhập mới" và nhấn Allow.`)
+        return
+      }
+    }
+
     if (!window.boldSignAPI) {
       alert('BoldSign API không khả dụng. Vui lòng chạy ứng dụng trong Electron.')
       return
@@ -75,7 +133,6 @@ export default function SignatureRequest({ patientName, getPdfBase64 }) {
 
       if (res.success) {
         setDocumentId(res.documentId)
-        // Mở URL trang BoldSign trong trình duyệt
         window.open(res.sendUrl, '_blank')
       } else {
         setResult(res)
@@ -90,21 +147,21 @@ export default function SignatureRequest({ patientName, getPdfBase64 }) {
   // Kiểm tra Bác sĩ đã ký chưa
   const handleCheckStatus = async () => {
     if (!documentId) return
-    const res = await window.boldSignAPI.checkStatus(documentId)
+    const res = await window.boldSignAPI.checkStatus({ documentId, doctorEmail })
     setStatus(res)
   }
 
   // Tải PDF đã ký về máy
   const handleDownload = async () => {
     if (!documentId) return
-    const res = await window.boldSignAPI.downloadSigned(documentId)
+    const res = await window.boldSignAPI.downloadSigned({ documentId, doctorEmail })
     if (res.success) alert(`✅ Đã lưu PDF đã ký tại: ${res.savedTo}`)
     else if (res.message !== 'Đã hủy lưu file') alert(`❌ Lỗi: ${res.message}`)
   }
 
   return (
     <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: '15px', marginTop: '16px', background: '#fff' }}>
-      <h5 style={{ marginTop: 0, marginBottom: '10px' }}>🖊️ Yêu cầu ký số phiếu khám</h5>
+      <h5 style={{ marginTop: 0, marginBottom: '10px' }}>🖊️ Yêu cầu ký số BoldSign</h5>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: '100%' }}>
         <input
@@ -118,8 +175,17 @@ export default function SignatureRequest({ patientName, getPdfBase64 }) {
           type="email"
           value={doctorEmail}
           onChange={e => setDoctorEmail(e.target.value)}
-          style={{ padding: '6px 12px', borderRadius: 4, border: '1px solid #ccc', fontSize: '13px' }}
+          style={{
+              padding: '6px 12px',
+              borderRadius: 4,
+              border: `1px solid ${authMethod === 'authorization_code' && doctorEmail && !loggedInUsers.includes(doctorEmail) ? '#d93025' : '#ccc'}`,
+              fontSize: '13px'
+          }}
         />
+        {authMethod === 'authorization_code' && doctorEmail && !loggedInUsers.includes(doctorEmail) && (
+            <div style={{ color: '#d93025', fontSize: '11px' }}>⚠️ Email này chưa đăng nhập BoldSign!</div>
+        )}
+
         <button
           onClick={handleSend}
           disabled={loading || loadingEmbedded}
